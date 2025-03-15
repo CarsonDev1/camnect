@@ -34,13 +34,14 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 		}
 	}, []);
 
-	// Prevent hydration errors by only rendering path-dependent content after mounting
+	// Return early loading state while not mounted
 	if (!mounted) {
 		return (
 			<html lang='en'>
 				<body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#F9F8F8] text-black`}>
 					<div className='w-full'>
-						<Suspense>{children}</Suspense>
+						{/* Show a minimal loading state without Redux */}
+						<div>Loading...</div>
 					</div>
 				</body>
 			</html>
