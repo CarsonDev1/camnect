@@ -111,8 +111,8 @@ export default function FAQ() {
 
 				<div className='relative'>
 					{/* Background decorative elements */}
-					<div className='absolute -top-10 -right-20 w-40 h-40 bg-[#FFE4CA] rounded-full opacity-40 -z-10'></div>
-					<div className='absolute -bottom-10 -left-20 w-32 h-32 bg-[#FFE4CA] rounded-full opacity-40 -z-10'></div>
+					{/* <div className='absolute -top-10 -right-20 w-40 h-40 bg-[#FFE4CA] rounded-full opacity-40 -z-10'></div>
+					<div className='absolute -bottom-10 -left-20 w-32 h-32 bg-[#FFE4CA] rounded-full opacity-40 -z-10'></div> */}
 
 					{/* FAQ Accordion */}
 					{faqItems.map((item, index) => (

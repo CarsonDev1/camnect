@@ -8,7 +8,7 @@ import axios from 'axios';
 import Link from 'next/link';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';
-import { setIsLogin } from '@/redux/slices/loginSlice';
+import { setIsLogin, setCurrentUser } from '@/redux/slices/loginSlice';
 
 interface LoginForm {
 	email: string;
@@ -34,14 +34,27 @@ export default function SignIn() {
 	const login = async () => {
 		try {
 			const response = await axiosInstance.post('/Authentication/SignIn', form);
-			toast.success('Đăng nhập thành công');
-			router.push('/');
+
+			// Set the access token in cookies
 			Cookies.set('access-key', response.data, { expires: 1 });
-			getUser();
-			dispatch(setIsLogin());
+
+			// Get user details right after login
+			await getUser();
+
+			// Show success message
+			toast.success('Đăng nhập thành công');
+
+			// Redirect to home page
+			router.push('/');
 		} catch (e: unknown) {
-			if (axios.isAxiosError(e) && e.response) {
-				toast.error(e.response.data);
+			if (axios.isAxiosError(e)) {
+				if (e.code === 'ERR_NETWORK' || e.code === 'ECONNABORTED') {
+					toast.error('Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.');
+				} else if (e.response) {
+					toast.error(e.response.data);
+				} else {
+					toast.error('Có lỗi xảy ra, vui lòng thử lại.');
+				}
 			} else {
 				toast.error('Có lỗi xảy ra, vui lòng thử lại.');
 			}
@@ -51,9 +64,16 @@ export default function SignIn() {
 	const getUser = async () => {
 		try {
 			const response = await axiosInstance.get('/Authentication/CurrentUser');
-			Cookies.set('currentUser', JSON.stringify(response.data));
-		} catch {
-			// Empty catch block
+			const userData = response.data;
+
+			// Store user data in cookie
+			Cookies.set('currentUser', JSON.stringify(userData));
+
+			// Dispatch both login status and user data to Redux
+			dispatch(setIsLogin());
+			dispatch(setCurrentUser(userData));
+		} catch (error) {
+			console.error('Error fetching user data:', error);
 		}
 	};
 
